@@ -10,8 +10,11 @@ public class Category {
     @PrimaryKey(autoGenerate = true)
     int id;
 
-    @ColumnInfo(name = "type")
-    String type;
+    @ColumnInfo(name = "name")
+    String name;
+
+    @ColumnInfo(name = "hexColor")
+    String hexColor;
 
 
 }
