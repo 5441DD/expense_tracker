@@ -13,15 +13,15 @@ public interface ExpenseDao {
     @Query("SELECT * FROM expense")
     List<Expense> listAll();
 
-    @Query("SELECT * FROM expense WHERE uid IN (:userIds)")
-    List<Expense> loadAllByIds(int[] userIds);
-
-    @Query("SELECT * FROM expense WHERE type LIKE type")
-    Expense findByName(String type);
-
     @Insert
     void insertAll(List<Expense> expenses);
     @Delete
     void delete(Expense expense);
+
+    @Query("SELECT SUM(value)  FROM expense WHERE typeId = :categoryId")
+    Integer sumExpensesbyId(int categoryId);
+
+    @Insert
+    void insertOne(Expense expense);
 
 }

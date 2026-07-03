@@ -17,4 +17,5 @@ public class Category {
     String hexColor;
 
 
+
 }

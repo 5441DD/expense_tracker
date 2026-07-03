@@ -26,4 +26,7 @@ public class Expense {
     @ColumnInfo(name = "note")
     public String note;
 
+    @ColumnInfo(name="isIncome")
+    boolean isIncome;
+
 }
