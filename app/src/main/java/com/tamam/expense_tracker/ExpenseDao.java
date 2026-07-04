@@ -18,8 +18,13 @@ public interface ExpenseDao {
     @Delete
     void delete(Expense expense);
 
-    @Query("SELECT SUM(value)  FROM expense WHERE typeId = :categoryId")
-    Integer sumExpensesbyId(int categoryId);
+    // Sadece giderler
+    @Query("SELECT SUM(value) FROM expense WHERE typeId = :categoryId AND isIncome = 0")
+    Integer sumGiderById(int categoryId);
+
+    // Sadece gelirler
+    @Query("SELECT SUM(value) FROM expense WHERE typeId = :categoryId AND isIncome = 1")
+    Integer sumGelirById(int categoryId);
 
     @Insert
     void insertOne(Expense expense);
