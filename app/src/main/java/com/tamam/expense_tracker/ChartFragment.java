@@ -28,7 +28,9 @@ import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ChartFragment extends Fragment {
@@ -39,6 +41,13 @@ public class ChartFragment extends Fragment {
     String lastChartMode = "gider";
     boolean isIncome = false;
 
+
+    public void refresh() {
+        MainActivity activity = (MainActivity) getActivity();
+        if (activity == null) return;
+
+        updateChart(expenseDao,categoryDao,lastChartMode,activity.startDate, activity.endDate);
+    }
 
     @Nullable
     @Override
@@ -61,8 +70,12 @@ public class ChartFragment extends Fragment {
         }
 
         Button button_add = view.findViewById(R.id.button_add);
-        updateChart(expenseDao,categoryDao,lastChartMode);
+        MaterialButton button_income=view.findViewById(R.id.btnIncome);
+        MaterialButton button_expense=view.findViewById(R.id.btnExpense);
+        updateChart(expenseDao, categoryDao,lastChartMode,activity.startDate,activity.endDate);;
         button_add.setOnClickListener(v -> showAddExpenseDialog());
+        button_income.setOnClickListener(v -> updateChart(expenseDao, categoryDao,"gelir",activity.startDate,activity.endDate));
+        button_expense.setOnClickListener(v -> updateChart(expenseDao, categoryDao,"gider",activity.startDate,activity.endDate));
 
         return view;
 
@@ -97,7 +110,7 @@ public class ChartFragment extends Fragment {
         else
             textView.setText("Gider");
 
-
+        MainActivity activity = (MainActivity) getActivity();
 
         MaterialButton materialButton= new MaterialButton(requireContext());
         MaterialButton materialButton1= new MaterialButton(requireContext());
@@ -155,6 +168,7 @@ public class ChartFragment extends Fragment {
 
 
         builder1.setPositiveButton("Kaydet", new DialogInterface.OnClickListener() {
+
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String miktar = input.getText().toString();
@@ -175,20 +189,26 @@ public class ChartFragment extends Fragment {
                     Toast.makeText(requireContext(), "Kategori seç", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                addExpense(expenseDao, checked_radiobuttonId, intMiktar, "2026-07-03", "",isIncome);
-                updateChart(expenseDao, categoryDao,lastChartMode);
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                String simdikiTarih = dateFormat.format(new Date());
+                addExpense(expenseDao, checked_radiobuttonId, intMiktar, simdikiTarih, "",isIncome);
+
+                updateChart(expenseDao, categoryDao,lastChartMode,activity.startDate,activity.endDate);
 
                 Toast.makeText(requireContext(), "Girilen Miktar: " + miktar +" Kaydedildi", Toast.LENGTH_LONG).show();
             }
         });
 
         builder1.setNegativeButton("Iptal", null);
-        updateChart(expenseDao, categoryDao,lastChartMode);
+
+        updateChart(expenseDao, categoryDao,lastChartMode,activity.startDate,activity.endDate);
         builder1.show();
 
     }
 
     void showAddCategoryDialog() {
+        MainActivity activity = (MainActivity) getActivity();
+
         AlertDialog.Builder builder= new AlertDialog.Builder(requireContext());
         builder.setTitle("Kategori Ekle");
 
@@ -265,10 +285,10 @@ public class ChartFragment extends Fragment {
             }
         });
         builder.setNegativeButton("Iptal", null);
-        updateChart(expenseDao, categoryDao,lastChartMode);
+        updateChart(expenseDao, categoryDao,lastChartMode,activity.startDate,activity.endDate);
         builder.show();
     }
-    public void updateChart(ExpenseDao expenseDao, CategoryDao categoryDao, String chartMode) {
+    public void updateChart(ExpenseDao expenseDao, CategoryDao categoryDao, String chartMode, String startDate,String endDate) {
 
         List<PieEntry> entries = new ArrayList<>();
 
@@ -277,12 +297,12 @@ public class ChartFragment extends Fragment {
         for(int i = 0; i < categories.size(); i++){
             Integer sum;
             if (chartMode.equals("gider")){
-                sum = expenseDao.sumGiderById(categories.get(i).id);
+                sum = expenseDao.sumByCategoryAndDateRange(categories.get(i).id, false, startDate, endDate);
             } else if (chartMode.equals("gelir")) {
-                sum = expenseDao.sumGelirById(categories.get(i).id);
+                sum = expenseDao.sumByCategoryAndDateRange(categories.get(i).id, true, startDate, endDate);
             }else {
-                Integer gider = expenseDao.sumGiderById(categories.get(i).id);
-                Integer gelir = expenseDao.sumGiderById(categories.get(i).id);
+                Integer gider = expenseDao.sumByCategoryAndDateRange(categories.get(i).id, false, startDate, endDate);
+                Integer gelir = expenseDao.sumByCategoryAndDateRange(categories.get(i).id, true, startDate, endDate);
                 if (gider==null) gider=0;
                 if (gelir==null) gelir=0;
                 sum=gelir-gider;

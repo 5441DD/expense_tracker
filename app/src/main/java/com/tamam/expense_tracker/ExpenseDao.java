@@ -5,6 +5,7 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
+import java.util.Date;
 import java.util.List;
 
 @Dao
@@ -18,6 +19,12 @@ public interface ExpenseDao {
     @Delete
     void delete(Expense expense);
 
+    @Query("SELECT * FROM expense WHERE isIncome = 0")
+    List<Expense> listAllByGider();
+
+    @Query("SELECT * FROM expense WHERE isIncome = 1")
+    List<Expense> listAllByGelir();
+
     // Sadece giderler
     @Query("SELECT SUM(value) FROM expense WHERE typeId = :categoryId AND isIncome = 0")
     Integer sumGiderById(int categoryId);
@@ -28,5 +35,14 @@ public interface ExpenseDao {
 
     @Insert
     void insertOne(Expense expense);
+
+    @Query("SELECT * FROM expense WHERE date BETWEEN :startDate AND :endDate AND isIncome = :isIncome")
+    List<Expense> listAllByDate(String startDate, String endDate, boolean isIncome);
+
+    @Query("SELECT SUM(value) FROM expense WHERE typeId = :categoryId AND isIncome = :isIncome AND date BETWEEN :startDate AND :endDate")
+    Integer sumByCategoryAndDateRange(int categoryId, boolean isIncome, String startDate, String endDate);
+
+    @Query("SELECT * FROM expense WHERE isIncome = :isIncome AND date BETWEEN :startDate AND :endDate")
+    List<Expense> listByDateRange(boolean isIncome, String startDate, String endDate);
 
 }
