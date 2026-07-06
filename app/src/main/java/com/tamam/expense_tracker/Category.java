@@ -8,13 +8,13 @@ import androidx.room.PrimaryKey;
 public class Category {
 
     @PrimaryKey(autoGenerate = true)
-    int id;
+    public int id;
 
     @ColumnInfo(name = "name")
-    String name;
+    public String name;
 
     @ColumnInfo(name = "hexColor")
-    String hexColor;
+    public String hexColor;
 
 
 

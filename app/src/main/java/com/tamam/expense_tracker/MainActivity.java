@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        ChipGroup chipGroup= new ChipGroup(MainActivity.this);
+        ChipGroup chipGroup;
         chipGroup=findViewById(R.id.chipGroup);
 
         chipGroup.setOnCheckedStateChangeListener((chipGroup1, list) ->{
